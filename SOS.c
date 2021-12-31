@@ -3,12 +3,14 @@
 #include<ctype.h>
 #include<stdlib.h>
 
-int n,player,comp;
+int n,player1,comp,player2;
+int mode_main,kesulitan;
 char arr[25][25];
+char nama1[30],nama2[30];
 bool papanPenuh=false;
 //daftar modul
 
-void player_move();
+void player_move(int r);
 void comp_move();
 int cari_os();
 int cari_ss();
@@ -21,6 +23,7 @@ void pilihKotak();
 int kotaky(char y);
 int cek_sos(int row, int col,int o,char symbol);
 int cek_papan();
+void end_game(int k);
 
 /* MAIN PROGRAM */
 
@@ -30,6 +33,26 @@ int main(){
 	printf("Halo! Selamat datang di game SOS!\n");
 	printf("Ketik 1 untuk main atau ketik 0 untuk keluar dari permainan = ");
 	scanf("%d", &play);
+    do
+    {
+    fflush(stdin);
+	printf("\nTentukan mode permainan (1 = Player vs comp, 2 = player vs player, 3 = player vs player vs comp) : ");
+	scanf("%d", &mode_main);
+    } while (mode_main!=1 && mode_main!=2 && mode_main!=3);
+    if (mode_main==1||mode_main==3)
+    {
+        do
+        {
+            fflush(stdin);
+            printf("\nKarena kamu memilih mode yang melibatkan computer maka pilih tingkat kesulitan computer dari 1 (mudah) sampai 3(sulit) : ");
+            scanf("%d", &kesulitan);
+        } while (kesulitan!=1 && kesulitan!=2 && kesulitan!=3);
+        
+        
+    }
+    
+    
+
 	if(play==1){
 		while(play==1){
 			printf("\nNah, sebelum main, tentukan dulu besar papannya!\n");
@@ -38,23 +61,62 @@ int main(){
 			besarPapan();
 			inis_papan();
 			Gambar_Papan(n);
-			do
+			if (mode_main==1)
 			{
-				player_move();
-				comp_move();				
-			} while (cek_papan());
-			
-			printf("****************************************************************\nPermainan selesai dengan score player = %d dan computer = %d\n****************************************************************\n", player,comp);
-			if (player>comp)
-			{
-				printf("Selamat anda menang!\n");
+                printf("Sekarang, tolong masukan nama dari player 1 (tanpa spasi): ");
+                scanf("%s",nama1);
+				do
+				{
+					player_move(1);
+                    if (!cek_papan())
+                    {
+                        break;
+                    }
+                    
+					comp_move();				
+				} while (cek_papan());
 			}
-			else
+			else if (mode_main==2)
 			{
-				printf("Sayang sekali anda kalah\n");
+                printf("Sekarang, tolong masukan nama dari player 1 (tanpa spasi): ");
+                scanf("%s",nama1);
+                fflush(stdin);
+                printf("Selanjutnya, tolong masukan nama dari player 2 (tanpa spasi): ");
+                scanf("%s",nama2);
+				do
+				{
+					player_move(1);
+                    if (!cek_papan())
+                    {
+                        break;
+                    }
+					player_move(2);				
+				} while (cek_papan());
 			}
-			
-			
+            else if (mode_main==3)
+            {
+                printf("Sekarang, tolong masukan nama dari player 1 (tanpa spasi): ");
+                scanf("%s",nama1);
+                fflush(stdin);
+                printf("Selanjutnya, tolong masukan nama dari player 2 (tanpa spasi): ");
+                scanf("%s",nama2);
+				do
+				{
+					player_move(1);
+                    if (!cek_papan())
+                    {
+                        break;
+                    }
+					player_move(2);
+                    if (!cek_papan())
+                    {
+                        break;
+                    }
+                    comp_move();				
+				} while (cek_papan());
+			}
+            
+			end_game(mode_main);
 			printf("****************************************************************\nKetik 1 untuk main lagi atau ketik 0 untuk keluar dari permainan = ");
 			scanf("%d", &play);
 		}
@@ -70,11 +132,62 @@ int main(){
 
 //modul-modul
 
-void player_move(){
-	pilihKotak();
+void player_move(int r){
+	pilihKotak(r);
 	Gambar_Papan(n);
 
 	return;
+}
+
+void end_game(int k){
+    if (k==1)
+    {
+    	printf("****************************************************************\nPermainan selesai dengan score %s = %d dan computer = %d\n****************************************************************\n",nama1, player1,comp);
+		
+        if (player1>comp)
+		{
+				printf("Selamat %s menang!\n", nama1);
+			}
+		else
+		{
+				printf("Sayang sekali anda kalah\n");
+			}
+    }
+    else if (k==2)
+    {
+        printf("****************************************************************\nPermainan selesai dengan score %s = %d dan %s = %d\n****************************************************************\n",nama1,player1,nama2,player2);
+		
+        if (player1>player2)
+		{
+				printf("Selamat %s menang!\n", nama1);
+			}
+		else
+		{
+				printf("Selamat %s menang!\n", nama2);
+			}
+    }
+    else if (k==3)
+    {
+        printf("****************************************************************\nPermainan selesai dengan score %s = %d, %s = %d dan Computer = %d\n****************************************************************\n",nama1,player1,nama2,player2,comp);
+        if (player1>player2 && player1>comp)
+        {
+            printf("Selamat %s menang!\n", nama1);
+        }
+        else if (player2>player1 && player2>comp)
+        {
+            printf("Selamat %s menang!\n", nama2);
+        }
+        else
+        {
+            printf("Kalian kalah sama komputer :(\n");
+        }
+        
+        
+    }
+    
+    
+    
+
 }
 
 void comp_move(){
@@ -87,19 +200,9 @@ void comp_move(){
   do
   {
     Gambar_Papan(n);
-	if(cari_os())
-	{
-		square = cari_os();
-		huruf = 'S';
-	}
-	else if(cari_ss())
-	{
-		square = cari_ss();
-		huruf = 'O';
-	}
-	else
-	{
-		square = find_square();
+    if (kesulitan==1)
+    {
+        square = find_square();
 		random = (rand() % (10 - 1)+1);
 		if (random%2==0)
 		{
@@ -109,14 +212,60 @@ void comp_move(){
 		{
 			huruf = 'O';
 		}
-		
-		
+    }
+    else if (kesulitan ==2)
+    {
+	    if(cari_ss())
+	    {
+		    square = cari_ss();
+		    huruf = 'O';
+	    }
+	    else
+	    {
+		    square = find_square();
+		    random = (rand() % (10 - 1)+1);
+		    if (random%2==0)
+		    {
+			    huruf = 'S';
+		    }
+		    else
+		    {
+			    huruf = 'O';
+		    }  
+        }
+    }
+    else if (kesulitan == 3)
+    {
+            if(cari_os())
+	        {
+		        square = cari_os();
+		        huruf = 'S';
+	        }
+	        else if(cari_ss())
+	        {
+		        square = cari_ss();
+		        huruf = 'O';
+	        }
+	        else
+	        {
+		        square = find_square();
+		        random = (rand() % (10 - 1)+1);
+		        if (random%2==0)
+		        {
+			        huruf = 'S';
+		        }
+		        else
+		        {
+			        huruf = 'O';
+		        }
+            }
+	
 	}
 	row = (square-1)/n;
 	col = (square-1)%n;
         
    	arr[row][col] = huruf;
-   }while(cek_sos(row,col,2,huruf));
+   }while(cek_sos(row,col,3,huruf));
 
    Gambar_Papan(n);
    printf("\nGiliran computer telah selesai!\n");
@@ -259,7 +408,8 @@ void inis_papan(){
 			arr[row][col]=' ';
 		}
 	}
-	player = 0;
+	player1 = 0;
+    player2 = 0;
 	comp = 0;
 	return;
 }
@@ -269,6 +419,7 @@ void Gambar_Papan(int n){
 	int row, col, counter=3, counter2=1;
 	char tanda = 65;
 	printf("  ");
+
 			for(int ii=0; ii<((n*4)+1); ii++)
 			{ 
 				if (ii==counter)
@@ -284,6 +435,7 @@ void Gambar_Papan(int n){
 				
 			}
 	printf("\n   ");
+
 	for(int ii=0; ii<((n*4)+1); ii++)
 			{ 
 				printf("-");
@@ -312,9 +464,22 @@ void Gambar_Papan(int n){
 	return;
 }
 
-void pilihKotak(){
+void pilihKotak(int f){
 	int x,row,col;
 	char y,huruf;
+	if (f==1)
+	{
+        printf("\n****************************************************************");
+		printf("\nGiliran %s Dimulai!!\n", nama1);
+	}
+	else if (f==2)
+	{
+        printf("\n****************************************************************");
+		printf("\nGiliran %s Dimulai!!\n", nama2);
+	}
+	
+	
+		
 	do
 	{
 		do
@@ -328,13 +493,13 @@ void pilihKotak(){
 
 			printf("Pilih huruf S atau O = ");
 			scanf(" %c", &huruf);
-			printf("Giliran player berakhir!\n\n");
-			printf("\n");
+
+
 		
 		
 		
 		arr[row][col]=toupper(huruf);
-	} while (cek_sos(row,col,1,toupper(huruf)));
+	} while (cek_sos(row,col,f,toupper(huruf)));
 	
 	
 	return;
@@ -473,13 +638,21 @@ int cek_sos(int row, int col,int o,char symbol){
   }
 
 
+
 	if (o == 1 && sos>0)
 	{
-		player= player + sos;
+		player1= player1 + sos;
 		Gambar_Papan(n);
-		printf("\nPlayer mendapatkan %d poin!\nGiliran Player lagi!", sos);
+		printf("\n%s mendapatkan %d poin!\nGiliran %s lagi!",nama1, sos, nama1);
 	}
 	else if (o == 2 && sos>0)
+	{
+		player2= player2 + sos;
+		Gambar_Papan(n);
+		printf("\n%s mendapatkan %d poin!\nGiliran %s lagi!",nama2, sos, nama1);
+	}
+	
+	else if (o == 3 && sos>0)
 	{
 		comp= comp + sos;
 		Gambar_Papan(n);
