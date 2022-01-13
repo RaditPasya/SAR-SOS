@@ -2,7 +2,6 @@
 #include<stdbool.h>
 #include<ctype.h>
 #include<stdlib.h>
-#include<string.h>
 
 int n,player1,comp,player2, HighScore;
 int mode_main,kesulitan;
@@ -19,7 +18,6 @@ void comp_move();
 int cari_os();
 int cari_ss();
 int find_square();
-bool square_valid(int row, int col);
 void besarPapan();
 void inis_papan();
 void Gambar_Papan(int n);
@@ -30,6 +28,10 @@ int cek_papan();
 void end_game(int k);
 
 /* MAIN PROGRAM */
+/*	author : SAR 
+	deskripsi: modul main program untuk menjalankan program
+	versi: 1
+*/
 
 int main(){	
 	int play=0;
@@ -143,48 +145,60 @@ int main(){
 
 
 //modul-modul
+/*	author : Suci 
+	deskripsi : modul untuk giliran bermain player(manusia)
+	versi : 1, 2 januari 2022
+*/ 
 
-void player_move(int r){
+void player_move(int r)  // r = 1 --> giliran player 1, r = 2 --> giliran player 2
+{
 	pilihKotak(r);
 	Gambar_Papan(n);
-
-	return;
 }
 
-void end_game(int k){
-    if (k==1)
+/*	author : Adinda
+	deskripsi : modul untuk menampilkan score dan status menang/kalah/seri
+				I.S : score dan pemenang tidak ditampilkan
+				F.S : score dan pemenang ditampilkan
+	versi :  versi 3, 10 januari 2022
+*/
+void end_game(int k)
+{
+    if (k==1)  // mode permainan player vs comp
     {
     	printf("****************************************************************\nPermainan selesai dengan score %s = %d dan Computer = %d\n****************************************************************\n",nama1, player1,comp);
-		if (player1==comp)
+		if (player1==comp) // skor player dan komputer sama
 		{
 			printf("%s dan Computer seri!\n", nama1);
 		}
-		else if (player1>comp)
+		else if (player1>comp)  // skor player lebih besar dari skor komputer
 		{
 			printf("Selamat %s menang!\n", nama1);
-			if (player1>HighScore){
-				fpointer=fopen("pemenang.txt", "w");
+			
+			if (player1>HighScore) // jika skor player lebih besar dari high score
+			{
+				fpointer=fopen("pemenang.txt", "w");  // memasukkan nama player ke file pemenang.txt
 				fprintf(fpointer, "%s -", nama1);
 				fclose(fpointer);
-				fpointer=fopen("highscore.txt", "w");
+				fpointer=fopen("highscore.txt", "w");  // memasukkan skor yang dicetak player ke file highscore.txt
 				fprintf(fpointer, "%d", player1);
 				fclose(fpointer);
 			}
 			
 		}
-		else
+		else //skor komputer lebih besar dari skor player
 		{
 			printf("Sayang sekali anda kalah.\n");
 		}
     }
-    else if (k==2)
+    else if (k==2)  // mode permainan player vs player
     {
         printf("****************************************************************\nPermainan selesai dengan score %s = %d dan %s = %d\n****************************************************************\n",nama1,player1,nama2,player2);
         if (player1==player2)
         {
         	printf("%s dan %s seri!\n", nama1, nama2);
 		}
-		else if (player1>player2)
+		else if (player1>player2)  // skor player 1 dan player 2 sama
 		{
 			printf("Selamat %s menang!\n", nama1);
 			if (player1>HighScore){
@@ -196,7 +210,7 @@ void end_game(int k){
 				fclose(fpointer);
 			}
 		}
-		else
+		else    // skor player 2 lebih besar dari skor player 1
 		{
 			printf("Selamat %s menang!\n", nama2);
 			if (player2>HighScore){
@@ -209,26 +223,26 @@ void end_game(int k){
 			}
 		}
     }
-    else if (k==3)
+    else if (k==3)  // mode permainan player vs player vs comp
     {
         printf("****************************************************************\nPermainan selesai dengan score %s = %d, %s = %d dan, Computer = %d\n****************************************************************\n",nama1,player1,nama2,player2,comp);
-        if (player1==player2 && player1==comp && player2==comp)
+        if (player1==player2 && player1==comp && player2==comp)  // skor player 1, player 2, dan komputer sama
         {
         	printf("%s, %s, dan Computer seri!\n", nama1, nama2);
 		}
-		else if (player1==player2 && player1>comp && player2>comp)
+		else if (player1==player2 && player1>comp && player2>comp)  // skor player 1 dan player 2 sama
 		{
 			printf("%s dan %s seri!\n", nama1, nama2);
 		}
-		else if (player1==comp && player1>player2 && comp>player2)
+		else if (player1==comp && player1>player2 && comp>player2)  // skor player 1 dan komputer sama
 		{
 			printf("%s dan Computer seri!\n", nama1);
 		}
-		else if (player2==comp && player2>player1 && comp>player1)
+		else if (player2==comp && player2>player1 && comp>player1)  // skor player 2 dan komputer sama
 		{
 			printf("%s dan Computer seri!\n", nama2);
 		}
-		else if (player1>player2 && player1>comp)
+		else if (player1>player2 && player1>comp)  // skor player 1 lebih besar dari player 2 dan komputer
         {
             printf("Selamat %s menang!\n", nama1);
             if (player1>HighScore){
@@ -240,7 +254,7 @@ void end_game(int k){
 				fclose(fpointer);
 			}
         }
-        else if (player2>player1 && player2>comp)
+        else if (player2>player1 && player2>comp)  // skor player 2 lebih besar dari player 1 dan komputer
         {
             printf("Selamat %s menang!\n", nama2);
             if (player2>HighScore){
@@ -252,20 +266,20 @@ void end_game(int k){
 				fclose(fpointer);
 			}
         }
-        else
+        else  // skor komputer lebih besar dari player 1 dan player 2
         {
             printf("Kalian kalah sama komputer :(\n");
-        }
-        
-        
+        }   
     }
-    
-    
-    
-
 }
-
-void comp_move(){
+/*	author : Radit
+	deskripsi : Modul yang akan memanggil 3 modul lainnya untuk menentukan di kotak manakah computer akan menempatkan simbol
+				I.S : Array papan dari giliran sebelumnya
+				F.S : Mengisi suatu kotak di papan dengan simbol S atau O
+	versi : versi 2, 28 desember 2021
+*/
+void comp_move()
+{
   int square;
   int row, col;
   int random;
@@ -344,9 +358,11 @@ void comp_move(){
 
    Gambar_Papan(n);
    printf("\nGiliran computer telah selesai!\n");
-   return;
 }
-
+/*	author : Radit
+	deskripsi : Mengecek apakah ada OS yang memiliki kotak kosong dibelakangnya atau SO yang memiliki kotak kosong di depannya
+	versi : versi 1, 27 Desember 2021
+*/
 int cari_os ()
 {
 	int square;
@@ -395,6 +411,10 @@ int cari_os ()
 	}
 	return 0;
 }
+/*	author : Radit
+	deskripsi : modul yang akan mengecek apabila ada kotak kosong yang diapit oleh di antara dua S
+	versi : versi 1, 27 Desember 2021
+*/
 
 int cari_ss()
 {
@@ -430,6 +450,10 @@ int cari_ss()
         }
 	return 0;
 }
+/*	author : Radit
+	deskripsi : modul yang akan mengecek apabila ada kotak kosong secara random
+	versi : versi 1, 27 Desember 2021
+*/
 
 int find_square()
 {
@@ -446,20 +470,28 @@ int find_square()
 	}
 	return 0;
 }
-
-void besarPapan(){
+/*	author : Suci
+	deskripsi : Menentukan besar papan
+				I.S : Papan tidak ditentukan besarnya
+				F.S : Besar papan telah ditentukan
+	versi :
+*/
+void besarPapan() // menentukan besar papan nxn (minimal 3x3 maksimal 15x15)
+{
 	bool benar=false;
 
 	while(benar==false){
 		printf("\n  Tolong ketik satu bilangan integer mulai dari 3 sampai 15!\n\n");
 		printf("   > Pilihanmu = ");
-		scanf("%d", &n);
-		if(n<3){
+		scanf("%d", &n); // angka yang iinput dimasukkan ke variabel global n
+		if(n<3) // n tidak boleh kurang dari 3
+		{
 			printf("\n. . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
 			printf("\n  <!!!> Papan tidak lebih kecil dari 3x3! <!!!>\n");
 		}
 		else{
-			if(n>15){
+			if(n>15) // n tidak boleh lebih dari 15
+			{
 				printf("\n. . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
 				printf("\n  <!!!> Papan tidak lebih besar dari 15x15! <!!!>\n");
 			}
@@ -469,8 +501,15 @@ void besarPapan(){
 		}	
 	}
 }
+/*	author : Adinda
+	deskripsi : Menginisialisasi array dengan mengisinya dengan � � (space)
+				I.S : Menginisialisasi array dengan mengisinya dengan � � (space)
+				F.S : Array terisi � � sesuai dengan besar papan
+	versi : versi 2, 24 Desember 2021
+*/
 
-void inis_papan(){
+void inis_papan()
+{
 	for (int row = 0; row < n; row++)
 	{
 		for (int col=0; col<n; col++)
@@ -478,11 +517,17 @@ void inis_papan(){
 			arr[row][col]=' ';
 		}
 	}
+	// skor player masih kosong sebelum game dimulai
 	player1 = 0;
     player2 = 0;
 	comp = 0;
-	return;
 }
+/*	author : Radit
+	deskripsi : Modul untuk menampilkan papan
+				I.S : Papan belum tampil
+				F.S : papan tertampilkan 
+	versi : versi 3.5, 29 desember 2021
+*/
 
 void Gambar_Papan(int n){
 	system("cls");
@@ -542,25 +587,29 @@ void Gambar_Papan(int n){
 		}
 	}
 	printf("\n");		
-	return;
 }
 
-void pilihKotak(int f){
+/*	author : Adinda
+	deskripsi : modul untuk memilih kotak mana yang akan diisi dan diisi dengan huruf apa
+				I.S : kotak belum diisi
+				F.S : suatu kotak yang dipilih diisi oleh S atau O
+	versi : versi 3, 2 januari 2022
+*/
+void pilihKotak(int f)
+{
 	int x,row,col;
 	char y,huruf;
 	bool hurufBenar;
-	if (f==1)
+	if (f==1) // giliran player 1
 	{
         printf("\n****************************************************************");
 		printf("\nGiliran %s Dimulai!!\n", nama1);
 	}
-	else if (f==2)
+	else if (f==2) // giliran player 2
 	{
         printf("\n****************************************************************");
 		printf("\nGiliran %s Dimulai!!\n", nama2);
 	}
-	
-	
 		
 	do
 	{
@@ -568,7 +617,7 @@ void pilihKotak(int f){
 		{
 			fflush(stdin);
 			printf("\nPilih kotak yang akan diisi = ");
-			scanf(" %c%d", &y, &x);
+			scanf(" %c%d", &y, &x); // y = kolom, x = baris
 			row = x-1;
 			col=kotaky(y);
 		} while (arr[row][col]!=' ');
@@ -581,33 +630,15 @@ void pilihKotak(int f){
 				hurufBenar=true;
 			}
 		}
-	
-		
-		arr[row][col]=toupper(huruf);
-	} while (cek_sos(row,col,f,toupper(huruf)));
-	
-	
-	return;
-	
+		arr[row][col]=toupper(huruf); //memasukkan huruf 'S' atau 'O' ke dalam kotak yang dipilih
+	} while (cek_sos(row,col,f,toupper(huruf)));	
 }
-
-bool square_valid (int row, int col)
+/*	author : Suci
+	deskripsi : mengisi nilai variabel 'kolom' sesuai dengan karakter yang tersimpan di variabel 'y'
+	versi : versi 1 , 24 Desember 2021
+*/
+int kotaky(char y)
 {
-	printf("\nNilai array 7%c7", arr[row][col]);
-   
-	if (arr[row][col]==' ')
-	{
-		printf("\nKotak Valid\n");
-		return true;
-	}
-	else 
-	{
-		printf("\nKotak Tidak Valid\n");
-		return false;
-	} 
-}
-
-int kotaky(char y){
 	int kolom;
 	switch(y){
 		case 'A' : kolom=0;break;
@@ -643,46 +674,53 @@ int kotaky(char y){
  	}
 	return kolom;
 }
+/*	author : Radit 
+	deskripsi : Cek apakah terbentuk sos secara vertikal, diagonal dan horizontal
+				I.S :belum mengecek apakah terbentuk sos secara vertikal, diagonal dan horizontal
+				F.S :telah di cek keberadaan SOS berdasarkan input dari modul sebelumnya dan merubah jumlah score yang didapatkan apabila SOS berhasil dibentuk
+	versi : versi 2.1, 1 januari 2022
+*/
 
-int cek_sos(int row, int col,int o,char symbol){
+int cek_sos(int row, int col,int o,char symbol)
+{
 	int sos = 0;
 	
-  if(symbol == 'S')
+  if(symbol == 'S') //jika yang diisi ke kotak adalah huruf 'S'
   {
-	if ((arr[row][col-2] == 'S') && (arr[row][col-1] == 'O'))
+	if ((arr[row][col-2] == 'S') && (arr[row][col-1] == 'O'))  //cek horizontal SO
 	{
 		sos++;
 	}
-	if ((arr[row][col+1]== 'O') && (arr[row][col+2] == 'S'))
+	if ((arr[row][col+1]== 'O') && (arr[row][col+2] == 'S'))  //cek horizontal OS
 	{
 		sos++;
 	}	
-	if((arr[row+1][col] == 'O') && (arr[row+2][col] == 'S'))
+	if((arr[row+1][col] == 'O') && (arr[row+2][col] == 'S'))  //cek vertikal OS
 	{
 		sos++;
 	}
-	if((arr[row-1][col] == 'O') && (arr[row-2][col] == 'S'))
+	if((arr[row-1][col] == 'O') && (arr[row-2][col] == 'S'))   //cek vertikal SO
 	{
 		sos++;
 	}
-	if((arr[row+1][col+1] == 'O') && (arr[row+2][col+2] == 'S'))
+	if((arr[row+1][col+1] == 'O') && (arr[row+2][col+2] == 'S')) //cek diagonal OS (kanan/?)
 	{
 		sos++;
 	}
-	if((arr[row-1][col-1] == 'O') && (arr[row-2][col-2] == 'S'))
+	if((arr[row-1][col-1] == 'O') && (arr[row-2][col-2] == 'S')) //cek diagonal SO
 	{
 		sos++;
 	}
-	if((arr[row+1][col-1] == 'O') && (arr[row+2][col-2] == 'S'))
+	if((arr[row+1][col-1] == 'O') && (arr[row+2][col-2] == 'S')) //cek diagonal SO (kiri/?)
 	{
 		sos++;
 	}
-	if((arr[row-1][col+1] == 'O') && (arr[row-2][col+2] == 'S'))
+	if((arr[row-1][col+1] == 'O') && (arr[row-2][col+2] == 'S')) //cek diagonal OS
 	{
 		sos++;
 	}
   }
-  else if(symbol == 'O')
+  else if(symbol == 'O') //jika yang diisi ke kotak adalah huruf 'O'
   {
 	if((arr[row+1][col] == 'S') && (arr[row-1][col] == 'S'))
 	{
@@ -748,8 +786,13 @@ int cek_sos(int row, int col,int o,char symbol){
 		return 0;
 	}
 }
+/*	author : Suci
+	deskripsi : modul untuk mengecek apakah papan penuh atau belum
+	versi : versi 3, 1 januari 2022
+*/
 
-int cek_papan(){
+int cek_papan()
+{
 
 	int row, col;
 	
@@ -766,8 +809,15 @@ int cek_papan(){
 	
 	return 0;
 }
+/*	author : Adinda
+	deskripsi : Modul untuk menampilkan peraturan pemainan
+				I.S : Peraturan permainan belum tampil
+				F.S : Peraturan permainan tampil
+	versi :
+*/
 
-void peraturan(){
+void peraturan()
+{
 	system("cls");
 	printf("*  .\n\n");
 	printf("!!! Hal Yang Perlu Dilakukan Sebelum Bermain !!!\n\n");
@@ -785,8 +835,14 @@ void peraturan(){
 	printf("\n\n*  .");
 	printf("\n\nKetik 0 untuk kembali ke menu utama = ");
 }
-
-void menu_utama(){
+/*	author : Adinda
+	deskripsi :Modul untuk menampilkan menu utama
+				I.S : Menu utama belum tampil
+				F.S : Menu utama tampi
+	versi :
+*/
+void menu_utama()
+{
 	printf("*  . Selamat datang di game SOS! .  * \n");
 	fpointer=fopen("pemenang.txt", "r");
 	fgets(Pemenang, 35, fpointer);
@@ -794,7 +850,7 @@ void menu_utama(){
 	fpointer=fopen("highscore.txt", "r");
 	fscanf(fpointer, "%d", &HighScore);
 	fclose(fpointer);
-	printf("\n  High Score = %s %d", Pemenang, HighScore);
-	printf("\n\n  1 = Main\n  2 = Aturan Permainan\n  3 = Keluar");
+	printf("\n  High Score = %s %d", Pemenang, HighScore);  // menampilkan high score yang dicapai pemain
+	printf("\n\n  1 = Main\n  2 = Aturan Permainan\n  3 = Keluar"); //opsi yang bisa dipilih player
 	printf("\n\n   > Pilihanmu = ");
 }
